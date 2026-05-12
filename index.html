@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#09090b"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="PassKit"/>
+  <title>PassKit — Bilet Yönetim Sistemi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ════ LOGIN VIEW ════ -->
+<div class="view" id="view-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="wordmark">
+        <div class="wordmark-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+        </div>
+        <span class="wordmark-text">PassKit</span>
+      </div>
+      <p class="login-subtitle">Bilet Yönetim ve Kapı Kontrol Sistemi</p>
+    </div>
+    <div class="error-msg" id="login-error"></div>
+    <form id="login-form">
+      <div class="field">
+        <label>Kullanıcı Adı</label>
+        <input type="text" id="login-user" placeholder="kullaniciadı" autocomplete="username" required/>
+      </div>
+      <div class="field">
+        <label>Şifre</label>
+        <div class="pass-wrap">
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" required/>
+          <button type="button" class="pass-toggle" data-target="login-pass">
+            <svg id="eye-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full btn-lg" id="login-btn" type="submit" style="margin-top:4px">Giriş Yap</button>
+    </form>
+    <div style="text-align:center;margin-top:14px">
+      <a href="#" id="reset-link" style="font-size:11px;color:var(--text-muted);text-decoration:none">Şifremi unuttum</a>
+    </div>
+  </div>
+</div>
+
+<!-- ════ ADMIN VIEW ════ -->
+<div class="view" id="view-admin">
+  <div class="app-header">
+    <div class="header-brand">
+      <span class="header-wordmark">PassKit</span>
+      <div class="header-sep"></div>
+      <span class="role-badge admin">Yönetici</span>
+      <span id="admin-event-name" style="font-size:12px;color:var(--text-muted)"></span>
+    </div>
+    <div class="header-right">
+      <span class="header-user" id="admin-user-name"></span>
+      <button class="btn btn-ghost btn-sm" id="open-settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Ayarlar
+      </button>
+      <button class="btn btn-success btn-sm" id="goto-door">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Kapı Modu
+      </button>
+      <button class="btn btn-ghost btn-sm logout-btn">Çıkış</button>
+    </div>
+  </div>
+
+  <div class="app-content">
+    <div class="stats-grid">
+      <div class="stat-card indigo">
+        <div class="stat-label">Toplam Kayıt</div>
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-sub">bilet oluşturuldu</div>
+      </div>
+      <div class="stat-card cyan">
+        <div class="stat-label">Ödeme Onaylı</div>
+        <div class="stat-value" id="stat-confirmed">0</div>
+        <div class="stat-sub">kesinleşmiş</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Kapıdan Geçti</div>
+        <div class="stat-value" id="stat-checkedin">0</div>
+        <div class="stat-sub">check-in yapıldı</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Tahsilat</div>
+        <div class="stat-value" id="stat-revenue">0 ₺</div>
+        <div class="stat-sub">onaylı biletler</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tabgroup="admin" data-tab="tickets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 000-4V7a2 2 0 012-2z"/></svg>
+        Biletler
+      </button>
+      <button class="tab-btn" data-tabgroup="admin" data-tab="partners">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M9 7a4 4 0 110 8 4 4 0 010-8z"/></svg>
+        Partnerlar
+      </button>
+    </div>
+
+    <!-- Biletler -->
+    <div class="tab-panel active" data-tabgroup="admin" data-tab="tickets">
+      <div class="section-header">
+        <h2>Tüm Biletler</h2>
+        <button class="btn btn-primary btn-sm" id="open-add-ticket-admin">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Yeni Bilet
+        </button>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="filter-search" placeholder="İsim, bilet kodu veya iletişim ara..."/>
+        <select id="filter-partner"><option value="">Tüm Partnerlar</option></select>
+        <select id="filter-status">
+          <option value="">Tüm Durumlar</option>
+          <option value="confirmed">Ödeme Alındı</option>
+          <option value="pending">Ödeme Bekleniyor</option>
+          <option value="checkedIn">İçeri Girdi</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Bilet No</th><th>Ad Soyad</th><th>İletişim</th><th>Partner</th><th>Ödeme</th><th>Giriş</th><th></th></tr>
+          </thead>
+          <tbody id="tickets-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Partnerlar -->
+    <div class="tab-panel" data-tabgroup="admin" data-tab="partners">
+      <div class="section-header">
+        <h2>Partnerlar</h2>
+        <button class="btn btn-primary btn-sm" id="open-add-partner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Partner Ekle
+        </button>
+      </div>
+      <div id="partners-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PARTNER VIEW ════ -->
+<div class="view" id="view-partner">
+  <div class="app-header">
+    <div class="header-brand">
+      <span class="header-wordmark">PassKit</span>
+      <div class="header-sep"></div>
+      <span class="role-badge partner">Partner</span>
+      <span id="partner-display-name" style="font-size:13px;font-weight:600"></span>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-ghost btn-sm logout-btn">Çıkış</button>
+    </div>
+  </div>
+  <div class="app-content">
+    <div class="stats-grid">
+      <div class="stat-card indigo">
+        <div class="stat-label">Toplam Bilet</div>
+        <div class="stat-value" id="p-stat-total">0</div>
+        <div class="stat-sub">oluşturduğun biletler</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Ödeme Alındı</div>
+        <div class="stat-value" id="p-stat-confirmed">0</div>
+      </div>
+      <div class="stat-card cyan">
+        <div class="stat-label">Kapıdan Geçti</div>
+        <div class="stat-value" id="p-stat-checkedin">0</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Tahsilat</div>
+        <div class="stat-value" id="p-stat-revenue">0 ₺</div>
+        <div class="stat-sub">onaylı biletler</div>
+      </div>
+    </div>
+    <div class="section-header">
+      <h2>Biletlerim</h2>
+      <button class="btn btn-primary" id="open-add-ticket-partner">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Yeni Bilet Ekle
+      </button>
+    </div>
+    <div class="filter-bar" style="margin-bottom:14px">
+      <input type="text" id="p-search" placeholder="İsim veya bilet kodu ile ara..."/>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Bilet No</th><th>Ad Soyad</th><th>İletişim</th><th>Ödeme</th><th>Giriş</th><th></th></tr>
+        </thead>
+        <tbody id="p-tickets-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DOOR VIEW ════ -->
+<div class="view" id="view-door">
+  <div class="door-header">
+    <div class="door-brand">
+      <button class="btn btn-ghost btn-sm" id="door-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Geri
+      </button>
+      <span class="door-mode-label">Kapı Kontrol</span>
+    </div>
+    <div class="door-counter">
+      Giriş: <strong id="door-checked">0</strong> / <span id="door-total">0</span>
+    </div>
+  </div>
+  <div class="door-search-wrap">
+    <div class="door-search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="door-search-input" id="door-search" placeholder="İsim veya bilet kodu..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+    </div>
+  </div>
+  <div class="door-results" id="door-results">
+    <div class="door-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p>İsim veya bilet kodu yazarak arama yapın</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL: Add Partner ════ -->
+<div class="modal-overlay" id="modal-add-partner">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Yeni Partner Ekle</h3>
+      <button class="modal-close" id="close-add-partner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="error-msg" id="add-partner-error"></div>
+    <form id="add-partner-form">
+      <div class="field"><label>Partner Adı</label><input type="text" id="ap-name" placeholder="örn. YTÜ Rehberi" required/></div>
+      <div class="field">
+        <label>Bilet Prefix Kodu</label>
+        <input type="text" id="ap-prefix" placeholder="YTU" maxlength="5" style="text-transform:uppercase;font-family:monospace;letter-spacing:2px" required/>
+        <small>Bu prefix ile bilet kodları oluşturulur: YTU-001, YTU-002...</small>
+      </div>
+      <div class="field"><label>Giriş Kullanıcı Adı</label><input type="text" id="ap-username" placeholder="ytu_partner" required/></div>
+      <div class="field">
+        <label>Şifre</label>
+        <div class="pass-wrap">
+          <input type="password" id="ap-password" placeholder="En az 6 karakter" minlength="6" required/>
+          <button type="button" class="pass-toggle" data-target="ap-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+      <div class="field"><label>Komisyon Oranı (%)</label><input type="number" id="ap-commission" placeholder="0" min="0" max="100" value="0"/></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="close-add-partner-2">İptal</button>
+        <button type="submit" class="btn btn-primary">Ekle</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ════ MODAL: Add Ticket (Admin) ════ -->
+<div class="modal-overlay" id="modal-add-ticket">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Yeni Bilet Oluştur</h3>
+      <button class="modal-close" id="close-add-ticket"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="error-msg" id="add-ticket-error"></div>
+    <form id="add-ticket-form">
+      <div class="field"><label>Ad Soyad</label><input type="text" id="at-name" placeholder="Alıcının adı soyadı" required/></div>
+      <div class="field"><label>İletişim <span style="color:var(--text-muted);font-weight:400">(isteğe bağlı)</span></label><input type="text" id="at-contact" placeholder="@instagram veya 05xx xxx xx xx"/></div>
+      <div class="field"><label>Partner</label><select id="at-partner"><option value="">Partner seçin...</option></select></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="close-add-ticket-2">İptal</button>
+        <button type="submit" class="btn btn-primary">Bilet Oluştur</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ════ MODAL: Add Ticket (Partner) ════ -->
+<div class="modal-overlay" id="modal-add-ticket-partner">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Yeni Bilet Oluştur</h3>
+      <button class="modal-close" id="close-add-ticket-partner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="error-msg" id="add-tp-error"></div>
+    <form id="add-ticket-partner-form">
+      <div class="field"><label>Ad Soyad</label><input type="text" id="tp-name" placeholder="Alıcının adı soyadı" required/></div>
+      <div class="field"><label>İletişim <span style="color:var(--text-muted);font-weight:400">(isteğe bağlı)</span></label><input type="text" id="tp-contact" placeholder="@instagram veya 05xx xxx xx xx"/></div>
+      <div class="info-box">Ödemeyi aldıktan sonra listeden "Ödeme Alındı" butonuna basarak onaylayın. Ödeme onaylanmadan kişi kapıdan geçemez.</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="close-add-ticket-partner-2">İptal</button>
+        <button type="submit" class="btn btn-primary">Bilet Oluştur</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ════ MODAL: Settings ════ -->
+<div class="modal-overlay" id="modal-settings">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Ayarlar</h3>
+      <button class="modal-close" id="close-settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <form id="settings-form">
+      <div class="field"><label>Etkinlik Adı</label><input type="text" id="set-event-name" required/></div>
+      <div class="field"><label>Bilet Fiyatı (₺)</label><input type="number" id="set-price" min="0" required/></div>
+      <div class="divider"></div>
+      <div class="field">
+        <label>Yeni Admin Şifresi <span style="color:var(--text-muted);font-weight:400">(boş bırakırsan değişmez)</span></label>
+        <div class="pass-wrap">
+          <input type="password" id="set-new-pass" placeholder="Yeni şifre girin..."/>
+          <button type="button" class="pass-toggle" data-target="set-new-pass"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="close-settings-2">İptal</button>
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="db.js"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
