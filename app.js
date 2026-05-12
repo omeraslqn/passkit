@@ -410,8 +410,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ── Door mode ──
-  $('goto-door').addEventListener('click', async () => { showView('view-door'); await renderDoorStats(); $('door-search').focus(); });
-  $('door-back').addEventListener('click', async () => { showView('view-admin'); await renderAdmin(); });
+  const openDoor = async () => { showView('view-door'); await renderDoorStats(); $('door-search').focus(); };
+  $('goto-door').addEventListener('click', openDoor);
+  $('goto-door-partner').addEventListener('click', openDoor);
+  $('door-back').addEventListener('click', async () => {
+    const session = Auth.getSession();
+    if (session.role === 'admin') {
+      showView('view-admin'); await renderAdmin();
+    } else {
+      showView('view-partner'); await renderPartner();
+    }
+  });
   $('door-search').addEventListener('input', e => {
     clearTimeout(doorSearchTimeout);
     doorSearchTimeout = setTimeout(() => searchDoor(e.target.value), 300);
