@@ -308,6 +308,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch(e) { showToast(e.message, 'error'); }
   });
 
+  // ── Export CSV ──
+  function exportToCSV(tickets, partners) {
+    const pMap = Object.fromEntries(partners.map(p => [p.id, p.name]));
+    const headers = ['Bilet Kodu', 'Ad Soyad', 'Iletisim', 'Partner', 'Odeme Durumu', 'Giris Durumu', 'Olusturulma Tarihi'];
+    const rows = tickets.map(t => [
+      t.code,
+      t.buyer_name,
+      t.buyer_contact || '',
+      pMap[t.partner_id] || '',
+      t.payment_confirmed ? 'Odendi' : 'Bekliyor',
+      t.checked_in ? 'Girdi' : 'Bekleniyor',
+      new Date(t.created_at).toLocaleString('tr-TR')
+    ]);
+    const csvContent = [headers, ...rows].map(e => e.map(s => `"${String(s).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `bilet_listesi_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  }
+
+  $('export-csv-admin')?.addEventListener('click', async () => {
+    try {
+      const [tickets, partners] = await Promise.all([DB.getTickets(getCurrentFilters()), DB.getPartners()]);
+      exportToCSV(tickets, partners);
+      showToast('Liste indirildi ✓', 'success');
+    } catch(e) { showToast('İndirme başarısız: ' + e.message, 'error'); }
+  });
+
+  $('export-csv-partner')?.addEventListener('click', async () => {
+    try {
+      const session = Auth.getSession();
+      const search = $('p-search').value;
+      const [tickets, partners] = await Promise.all([
+        DB.getTickets({ partnerId: session.partnerId, search }),
+        DB.getPartners()
+      ]);
+      exportToCSV(tickets, partners);
+      showToast('Liste indirildi ✓', 'success');
+    } catch(e) { showToast('İndirme başarısız: ' + e.message, 'error'); }
+  });
+
   // ── Admin tabs ──
   document.querySelectorAll('[data-tabgroup="admin"]').forEach(el => {
     el.addEventListener('click', () => showTab('admin', el.dataset.tab));

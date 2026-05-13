@@ -3,8 +3,9 @@
 // ═══════════════════════════════════════════════════
 
 const DB = (() => {
+  // ── Config (anon key eklenecek) ──
   const SUPABASE_URL = 'https://qihhwehkszwifrjnwsdy.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpaGh3ZWhrc3p3aWZyam53c2R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTgyOTgsImV4cCI6MjA5NDE5NDI5OH0.Kc4B4V_mef3VVkWazqR_CiQN-Lvq7dD_wAiLx69zo7g';
+  const SUPABASE_KEY = '__SUPABASE_ANON_KEY__'; // buraya key gelecek
 
   const headers = {
     'apikey': SUPABASE_KEY,
@@ -15,12 +16,12 @@ const DB = (() => {
 
   async function req(method, table, params = '', body = null) {
     const url = `${SUPABASE_URL}/rest/v1/${table}${params}`;
-    const opts = { method, headers: { ...headers } };
+    const opts = { method, headers };
     if (body) opts.body = JSON.stringify(body);
     const res = await fetch(url, opts);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `API hatası: ${res.status}`);
+      throw new Error(err.message || `API error: ${res.status}`);
     }
     const text = await res.text();
     return text ? JSON.parse(text) : [];
@@ -42,12 +43,11 @@ const DB = (() => {
   }
 
   async function addPartner({ name, prefix, username, passwordHash, commissionRate = 0 }) {
-    const rows = await req('GET', 'partners', `?or=(username.eq.${encodeURIComponent(username)},prefix.eq.${encodeURIComponent(prefix.toUpperCase())})`);
-    if (rows.length) throw new Error('Bu kullanıcı adı veya prefix zaten kullanılıyor.');
+    const existing = await req('GET', 'partners', `?or=(username.eq.${username},prefix.eq.${prefix.toUpperCase()})`);
+    if (existing.length) throw new Error('Bu kullanıcı adı veya prefix zaten kullanılıyor.');
     const [partner] = await req('POST', 'partners', '', {
       name, prefix: prefix.toUpperCase(), username,
-      password_hash: passwordHash,
-      commission_rate: commissionRate
+      password_hash: passwordHash, commission_rate: commissionRate
     });
     return partner;
   }
@@ -70,43 +70,30 @@ const DB = (() => {
   async function getTickets(filters = {}) {
     let params = '?order=created_at.desc';
     if (filters.partnerId) params += `&partner_id=eq.${filters.partnerId}`;
-    if (filters.status === 'confirmed')  params += '&payment_confirmed=eq.true';
-    if (filters.status === 'pending')    params += '&payment_confirmed=eq.false';
+    if (filters.status === 'confirmed') params += '&payment_confirmed=eq.true';
+    if (filters.status === 'pending')   params += '&payment_confirmed=eq.false';
     if (filters.status === 'checkedIn') params += '&checked_in=eq.true';
     if (filters.search) {
-      const q = encodeURIComponent(filters.search);
+      const q = filters.search.toLowerCase();
       params += `&or=(buyer_name.ilike.*${q}*,code.ilike.*${q}*,buyer_contact.ilike.*${q}*)`;
     }
     return req('GET', 'tickets', params);
   }
 
-  function generateRandomCode(prefix) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let rand = '';
-    for (let i = 0; i < 4; i++) {
-      rand += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return `${prefix}-${rand}`;
+  async function getNextCode(prefix) {
+    const tickets = await req('GET', 'tickets', `?code=like.${prefix}-*&order=created_at.desc`);
+    const nums = tickets.map(t => parseInt(t.code.split('-')[1]) || 0);
+    const next = nums.length ? Math.max(...nums) + 1 : 1;
+    return `${prefix}-${String(next).padStart(3, '0')}`;
   }
 
   async function addTicket({ buyerName, buyerContact, partnerId, partnerPrefix }) {
-    let ticket = null;
-    for (let i = 0; i < 5; i++) {
-      try {
-        const code = generateRandomCode(partnerPrefix);
-        const [t] = await req('POST', 'tickets', '', {
-          code,
-          buyer_name: buyerName.trim(),
-          buyer_contact: (buyerContact || '').trim(),
-          partner_id: partnerId
-        });
-        ticket = t;
-        break;
-      } catch (err) {
-        if (!err.message.includes('duplicate key value')) throw err;
-      }
-    }
-    if (!ticket) throw new Error('Bilet kodu oluşturulamadı, lütfen tekrar deneyin.');
+    const code = await getNextCode(partnerPrefix);
+    const [ticket] = await req('POST', 'tickets', '', {
+      code, buyer_name: buyerName.trim(),
+      buyer_contact: (buyerContact || '').trim(),
+      partner_id: partnerId
+    });
     return ticket;
   }
 
@@ -121,8 +108,7 @@ const DB = (() => {
     if (t.checked_in) throw new Error('Bu kişi zaten içeri girmiş!');
     if (!t.payment_confirmed) throw new Error('Ödeme onaylanmamış!');
     await req('PATCH', 'tickets', `?id=eq.${ticketId}`, {
-      checked_in: true,
-      checked_in_at: new Date().toISOString()
+      checked_in: true, checked_in_at: new Date().toISOString()
     });
   }
 
@@ -133,10 +119,8 @@ const DB = (() => {
   async function getStats(partnerId = null) {
     let params = '?select=payment_confirmed,checked_in';
     if (partnerId) params += `&partner_id=eq.${partnerId}`;
-    const [tickets, settings] = await Promise.all([
-      req('GET', 'tickets', params),
-      getSettings()
-    ]);
+    const tickets = await req('GET', 'tickets', params);
+    const settings = await getSettings();
     return {
       total: tickets.length,
       confirmed: tickets.filter(t => t.payment_confirmed).length,
@@ -146,7 +130,8 @@ const DB = (() => {
     };
   }
 
-  function init() {} // no-op for Supabase
+  // init (no-op for Supabase — tables already exist)
+  function init() {}
 
   return {
     init, getSettings, saveSettings,

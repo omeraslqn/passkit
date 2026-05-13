@@ -112,10 +112,16 @@
     <div class="tab-panel active" data-tabgroup="admin" data-tab="tickets">
       <div class="section-header">
         <h2>Tüm Biletler</h2>
-        <button class="btn btn-primary btn-sm" id="open-add-ticket-admin">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Yeni Bilet
-        </button>
+        <div style="display:flex; gap:8px">
+          <button class="btn btn-ghost btn-sm" id="export-csv-admin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Listeyi İndir
+          </button>
+          <button class="btn btn-primary btn-sm" id="open-add-ticket-admin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Yeni Bilet
+          </button>
+        </div>
       </div>
       <div class="filter-bar">
         <input type="text" id="filter-search" placeholder="İsim, bilet kodu veya iletişim ara..."/>
@@ -191,10 +197,16 @@
     </div>
     <div class="section-header">
       <h2>Biletlerim</h2>
-      <button class="btn btn-primary" id="open-add-ticket-partner">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Yeni Bilet Ekle
-      </button>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-ghost btn-sm" id="export-csv-partner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Listeyi İndir
+        </button>
+        <button class="btn btn-primary btn-sm" id="open-add-ticket-partner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Yeni Bilet Ekle
+        </button>
+      </div>
     </div>
     <div class="filter-bar" style="margin-bottom:14px">
       <input type="text" id="p-search" placeholder="İsim veya bilet kodu ile ara..."/>
