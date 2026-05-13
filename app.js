@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       t.checked_in ? 'Girdi' : 'Bekleniyor',
       new Date(t.created_at).toLocaleString('tr-TR')
     ]);
-    const csvContent = [headers, ...rows].map(e => e.map(s => `"${String(s).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const csvContent = [headers, ...rows].map(e => e.map(s => `"${String(s).replace(/"/g, '""')}"`).join(';')).join('\n');
     const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
