@@ -92,7 +92,14 @@ async function renderAdminTickets(filters = {}) {
   }
   tbody.innerHTML = tickets.map(t => `
     <tr>
-      <td><code style="color:var(--primary);font-family:monospace;font-size:12px;letter-spacing:.5px">${esc(t.code)}</code></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <code style="color:var(--primary);font-family:monospace;font-size:12px;letter-spacing:.5px">${esc(t.code)}</code>
+          <button class="btn btn-ghost btn-sm" style="padding:4px;min-width:auto;height:auto;color:var(--text-muted)" onclick="copyCode('${esc(t.code)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+      </td>
       <td style="font-weight:500">${esc(t.buyer_name)}</td>
       <td style="color:var(--text-muted)">${esc(t.buyer_contact || '—')}</td>
       <td>${pMap[t.partner_id] ? `<span class="pill pill-cyan" style="font-size:10px">${esc(pMap[t.partner_id].name)}</span>` : '—'}</td>
@@ -166,7 +173,14 @@ async function renderPartnerTickets(search = '') {
   }
   tbody.innerHTML = tickets.map(t => `
     <tr>
-      <td><code style="color:var(--cyan);font-family:monospace;font-size:12px;letter-spacing:.5px">${esc(t.code)}</code></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <code style="color:var(--cyan);font-family:monospace;font-size:12px;letter-spacing:.5px">${esc(t.code)}</code>
+          <button class="btn btn-ghost btn-sm" style="padding:4px;min-width:auto;height:auto;color:var(--text-muted)" onclick="copyCode('${esc(t.code)}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+      </td>
       <td style="font-weight:500">${esc(t.buyer_name)}</td>
       <td style="color:var(--text-muted)">${esc(t.buyer_contact || '—')}</td>
       <td>${payPill(t.payment_confirmed)}</td>
@@ -509,3 +523,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     showView('view-login');
   }
 });
+
+// ── Global Actions ──
+window.copyCode = function(code) {
+  navigator.clipboard.writeText(code).then(() => {
+    showToast(`${code} kopyalandı ✓`, 'success');
+  }).catch(() => {
+    showToast('Kopyalama başarısız!', 'error');
+  });
+};

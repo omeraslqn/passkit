@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="PassKit"/>
   <title>PassKit — Bilet Yönetim Sistemi</title>
+  <link rel="manifest" href="manifest.json"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
@@ -124,7 +125,7 @@
         </div>
       </div>
       <div class="filter-bar">
-        <input type="text" id="filter-search" placeholder="İsim, bilet kodu veya iletişim ara..."/>
+        <input type="search" id="filter-search" placeholder="İsim, bilet kodu veya iletişim ara..."/>
         <select id="filter-partner"><option value="">Tüm Partnerlar</option></select>
         <select id="filter-status">
           <option value="">Tüm Durumlar</option>
@@ -209,7 +210,7 @@
       </div>
     </div>
     <div class="filter-bar" style="margin-bottom:14px">
-      <input type="text" id="p-search" placeholder="İsim veya bilet kodu ile ara..."/>
+      <input type="search" id="p-search" placeholder="İsim veya bilet kodu ile ara..."/>
     </div>
     <div class="table-wrap">
       <table>
@@ -239,7 +240,7 @@
   <div class="door-search-wrap">
     <div class="door-search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" class="door-search-input" id="door-search" placeholder="İsim veya bilet kodu..." autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <input type="search" class="door-search-input" id="door-search" placeholder="İsim veya bilet kodu..." autocomplete="off" autocorrect="off" spellcheck="false"/>
     </div>
   </div>
   <div class="door-results" id="door-results">
@@ -353,5 +354,12 @@
 <script src="db.js?v=2"></script>
 <script src="auth.js?v=2"></script>
 <script src="app.js?v=2"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(console.error);
+    });
+  }
+</script>
 </body>
 </html>
