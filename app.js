@@ -57,8 +57,17 @@ async function renderAdmin() {
   const session = Auth.getSession();
   $('admin-user-name').textContent = session.name;
   await renderAdminStats();
+  await populatePartnerFilter();
   await renderAdminTickets();
   await renderAdminPartners();
+}
+
+async function populatePartnerFilter() {
+  const sel = $('filter-partner'); if (!sel) return;
+  const cur = sel.value;
+  const partners = await DB.getPartners();
+  sel.innerHTML = '<option value="">Tüm Partnerlar</option>' +
+    partners.map(p => `<option value="${p.id}" ${cur===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
 }
 
 async function renderAdminStats() {
@@ -361,13 +370,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let t; el.addEventListener('input', () => { clearTimeout(t); t = setTimeout(() => renderAdminTickets(getCurrentFilters()), 350); });
   });
 
-  async function populatePartnerFilter() {
-    const sel = $('filter-partner'); if (!sel) return;
-    const cur = sel.value;
-    const partners = await DB.getPartners();
-    sel.innerHTML = '<option value="">Tüm Partnerlar</option>' +
-      partners.map(p => `<option value="${p.id}" ${cur===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
-  }
 
   // ── Add Partner ──
   $('open-add-partner').addEventListener('click', () => openModal('modal-add-partner'));
