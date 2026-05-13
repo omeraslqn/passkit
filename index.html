@@ -253,11 +253,11 @@
         <input type="text" id="ap-prefix" placeholder="YTU" maxlength="5" style="text-transform:uppercase;font-family:monospace;letter-spacing:2px" required/>
         <small>Bu prefix ile bilet kodları oluşturulur: YTU-001, YTU-002...</small>
       </div>
-      <div class="field"><label>Giriş Kullanıcı Adı</label><input type="text" id="ap-username" placeholder="ytu_partner" required/></div>
+      <div class="field"><label>Giriş Kullanıcı Adı</label><input type="text" id="ap-username" placeholder="ytu_partner" autocomplete="off" required/></div>
       <div class="field">
         <label>Şifre</label>
         <div class="pass-wrap">
-          <input type="password" id="ap-password" placeholder="En az 6 karakter" minlength="6" required/>
+          <input type="password" id="ap-password" placeholder="En az 6 karakter" minlength="6" autocomplete="new-password" required/>
           <button type="button" class="pass-toggle" data-target="ap-password"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
       </div>
